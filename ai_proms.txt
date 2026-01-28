@@ -1,5 +1,49 @@
 1.ich möchte Die Daten die ich  einlese mit python . Als ein Balkendiagram darstellen wo ich aber die Differens zwischen den ersten und den Letzten wert nur zeige pro Kategorie in den 8 Städten  mit go.bar und Fifferenz berechnung von zwei Jahren von mehreren Kategorien
+Antwort:
+Um die Daten in Python so darzustellen, wie du es beschrieben hast, kannst du die Bibliothek Plotly verwenden, um Balkendiagramme zu erstellen. Hier ist eine Schritt-für-Schritt-Anleitung zur Umsetzung:
 
+Daten vorbereiten
+Zuerst benötigst du Daten in einem geeigneten Format (z. B. als Pandas DataFrame), die für die Erstellung des Diagramms geeignet sind. Ich nehme an, dass deine Daten zwei Jahre umfassen und mehrere Kategorien für acht Städte enthalten.
+
+Beispiel-Datensatz:
+python
+
+Code kopieren
+import pandas as pd
+
+# Beispiel-Daten
+data = {
+    'Stadt': ['StadtA', 'StadtA', 'StadtB', 'StadtB', 'StadtC', 'StadtC', 'StadtD', 'StadtD'] * 2,
+    'Jahr': [2023, 2024] * 8,
+    'Kategorie1': [100, 150, 200, 250, 300, 350, 400, 450],
+    'Kategorie2': [80, 120, 220, 270, 350, 400, 500, 550],
+}
+
+df = pd.DataFrame(data)
+Differenzen berechnen
+Berechne die Differenz zwischen den Werten der beiden Jahre pro Kategorie.
+
+python
+
+Code kopieren
+# Differenzen berechnen
+df_pivot = df.pivot(index='Stadt', columns='Jahr', values=['Kategorie1', 'Kategorie2'])
+
+# Differenz für jede Kategorie berechnen
+df_diff = df_pivot['Kategorie1'].diff(axis=1).iloc[:, -1].rename('Kategorie1_Differenz')
+df_diff2 = df_pivot['Kategorie2'].diff(axis=1).iloc[:, -1].rename('Kategorie2_Differenz')
+
+# Daten zusammenführen
+df_differenzen = pd.DataFrame({
+    'Kategorie1_Differenz': df_diff,
+    'Kategorie2_Differenz': df_diff2
+}).reset_index()
+Balkendiagramm mit Plotly erstellen
+Jetzt, da du die Differenzen hast, kannst du das Balkendiagramm mit plotly.graph_objects erstellen.
+
+python
+
+Code kopieren
 import plotly.graph_objects as go
 
 # Balkendiagramm erstellen
@@ -39,5 +83,164 @@ fig.show()
 
 2.Gib mir farben in  Hexadezimalformat für Python 
 
+Antwort:
 
 colors = ['#1F77B4', '#FF7F0E', '#2CA02C', '#D62728', '#9467BD', '#8C564B', '#E377C2', '#7F7F7F']
+
+3.import pandas as pd
+import plotly.graph_objects as go
+from gapminder import gapminder
+# Daten laden
+df_inkar = pd.read_parquet(url)
+
+# Sortierung hoch oder runter
+V_Sortierung = False
+# Nordbayern filtern
+df_inkar = df_inkar[df_inkar["Nordbayern"] == True]
+
+# Nur Kreise
+df_inkar = df_inkar[df_inkar["Raumbezug"] == "Kreise"]
+#df_inkar = df_inkar[df_inkar["Name"] == "Bamberg", "Amberg"]
+
+
+# Daten filtern
+indikatoren_liste = ["Offene Stellen mit Anforderungsniveau Helfer",
+"Offene Stellen mit Anforderungsniveau Fachkraft",
+"Offene Stellen mit Anforderungsniveau Spezialist",
+"Offene Stellen mit Anforderungsniveau Experte",
+
+"Beschäftigte mit Anforderungsniveau Helfer",
+"Beschäftigte mit Anforderungsniveau Fachkraft",
+"Beschäftigte mit Anforderungsniveau Spezialist",
+"Beschäftigte mit Anforderungsniveau Experte"]
+df_inkar = df_inkar[df_inkar["Indikator"].isin(indikatoren_liste)]
+
+# Pivotieren der Daten in ein breites Format
+df_wide = (
+    df_inkar
+    .loc[df_inkar["Indikator"].isin(indikatoren_liste)]
+    .pivot_table(
+        index=["Kennziffer", "Name", "Nordbayern", "Raumbezug", "Zeitbezug"],  # Keys je Beobachtung
+        columns="Indikator",
+        values="Wert",
+        aggfunc="first"  # oder "mean" falls Duplikate existieren
+    )
+    .reset_index()
+)
+
+# optional: Spaltennamen "ent-flatten" (pivot_table erzeugt ggf. einen columns-Index)
+df_wide.columns.name = None
+
+# Lösche Zeilen in denen V_Kategorie NaN sind
+df_wide = df_wide.dropna(subset=indikatoren_liste)
+# ----------------------------
+# Daten laden & vorbereiten
+# ----------------------------
+df = df_wide
+
+# Wenn nur bestimmte auswahl angezeigt werden soll dann Namen eintragen sonst  "   sorted(df["Name"].unique()) " 
+# 
+citys = ["Bamberg, Stadt", "Bayreuth, Stadt", "Coburg, Stadt",  "Ansbach, Stadt", "Erlangen", "Fürth, Stadt", "Nürnberg", "Würzburg, Stadt" ]     
+
+# Variablen, die per Dropdown gewählt werden können
+metrics = {
+"Offene Stellen mit Anforderungsniveau Helfer":"Offene Stellen Helfer",
+"Offene Stellen mit Anforderungsniveau Fachkraft":"Offene Stellen Fachkraft",
+"Offene Stellen mit Anforderungsniveau Spezialist":"Offene Stellen Spezialist",
+"Offene Stellen mit Anforderungsniveau Experte":"Offene Stellen Experte",
+
+"Beschäftigte mit Anforderungsniveau Helfer":"Beschäftigte Helfer",
+"Beschäftigte mit Anforderungsniveau Fachkraft":"Beschäftigte Fachkraft",
+"Beschäftigte mit Anforderungsniveau Spezialist":"Beschäftigte Spezialist",
+"Beschäftigte mit Anforderungsniveau Experte":"Beschäftigte Experte",
+}
+
+start_metric = "Offene Stellen mit Anforderungsniveau Helfer"
+default_citys = citys = ["Bamberg, Stadt", "Bayreuth, Stadt", "Coburg, Stadt",  "Ansbach, Stadt", "Erlangen", "Fürth, Stadt", "Nürnberg", "Würzburg, Stadt" ]     #sorted(df["Name"].unique())
+
+
+# ----------------------------
+# Daten pro Land & Variable vorbereiten
+# ----------------------------
+x_data = []  # Jahresachsen pro Land
+data_per_metric = {m: [] for m in metrics.keys()}  # y-Daten pro Variable & Land
+
+for city in citys:
+    df_c = df[df["Name"] == city].sort_values("Zeitbezug")
+    x_data.append(df_c["Zeitbezug"])
+    for m in metrics.keys():
+        data_per_metric[m].append(df_c[m])
+ich möchte Die Daten die ich hier einlese. Als ein Balkendiagram darstellen wo ich aber die Differens zwischen den ersten und den Letzten wert nur zeige pro Kategorie in den 8 Städten 
+
+
+Antwort:Um die Differenzen zwischen den ersten und den letzten Werten für jede Kategorie in den ausgewählten Städten darzustellen, kannst du folgenden Ansatz verwenden:
+
+Schritte zur Umsetzung
+Datenvorbereitung: Berechne die Differenz zwischen den ersten und letzten Werten für jede Kategorie in den ausgewählten Städten.
+Balkendiagramm erstellen: Verwende Plotly, um die Differenzen pro Kategorie in einem Balkendiagramm darzustellen.
+Schritt 1: Differenzen berechnen
+Hier ist der Code, um die Daten entsprechend zu verarbeiten:
+
+python
+
+Code kopieren
+import pandas as pd
+import plotly.graph_objects as go
+
+# Du hast bereits df_wide erstellt
+df = df_wide
+
+# Filtere nur die gewünschten Städte
+citys = ["Bamberg, Stadt", "Bayreuth, Stadt", "Coburg, Stadt", "Ansbach, Stadt", "Erlangen", "Fürth, Stadt", "Nürnberg", "Würzburg, Stadt"]
+
+# Aufbereiten der Differenzen
+differenzen = {}
+
+# Berechne die Differenzen für jeden Indikator
+for city in citys:
+    df_c = df[df["Name"] == city]  # Filter für die Stadt
+    
+    for indikator in metrics.keys():
+        # Überprüfen, ob die Indikator-Spalte existiert
+        if indikator in df_c.columns:
+            # Erste und letzte Werte feststellen
+            erster_wert = df_c[df_c["Zeitbezug"] == df_c["Zeitbezug"].min()][indikator].values[0]
+            letzter_wert = df_c[df_c["Zeitbezug"] == df_c["Zeitbezug"].max()][indikator].values[0]
+            
+            # Differenz berechnen
+            differenz = letzter_wert - erster_wert
+            
+            # Speichern der Differenz
+            differenzen[(city, indikator)] = differenz
+
+# Umwandlung in DataFrame für die Darstellung
+differenzen_df = pd.DataFrame(differenzen).T.reset_index()
+differenzen_df.columns = ['Stadt', 'Indikator', 'Differenz']
+Schritt 2: Balkendiagramm erstellen
+Jetzt, da du die Differenzen hast, kannst du das Balkendiagramm erstellen:
+
+python
+
+Code kopieren
+# Balkendiagramm erstellen
+fig = go.Figure()
+
+# Füge für jeden Indikator eine trace hinzu
+for indikator in metrics.keys():
+    indikator_data = differenzen_df[differenzen_df['Indikator'] == indikator]
+    fig.add_trace(go.Bar(
+        x=indikator_data['Stadt'],
+        y=indikator_data['Differenz'],
+        name=metrics[indikator]
+    ))
+
+# Diagramm anpassen
+fig.update_layout(
+    title='Differenzen der Indikatoren zwischen erstem und letztem Wert in den Städten',
+    xaxis_title='Städte',
+    yaxis_title='Differenz',
+    barmode='group'
+)
+
+# Diagramm anzeigen
+fig.show()
