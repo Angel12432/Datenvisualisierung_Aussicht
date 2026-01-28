@@ -1,0 +1,43 @@
+1.ich möchte Die Daten die ich  einlese mit python . Als ein Balkendiagram darstellen wo ich aber die Differens zwischen den ersten und den Letzten wert nur zeige pro Kategorie in den 8 Städten  mit go.bar und Fifferenz berechnung von zwei Jahren von mehreren Kategorien
+
+import plotly.graph_objects as go
+
+# Balkendiagramm erstellen
+fig = go.Figure()
+
+# Daten für Kategorie1 hinzufügen
+fig.add_trace(go.Bar(
+    x=df_differenzen['Stadt'],
+    y=df_differenzen['Kategorie1_Differenz'],
+    name='Kategorie 1'
+))
+
+# Daten für Kategorie2 hinzufügen
+fig.add_trace(go.Bar(
+    x=df_differenzen['Stadt'],
+    y=df_differenzen['Kategorie2_Differenz'],
+    name='Kategorie 2'
+))
+
+# Layout anpassen
+fig.update_layout(
+    title='Differenzen der Kategorien zwischen 2023 und 2024',
+    xaxis_title='Stadt',
+    yaxis_title='Differenz',
+    barmode='group'
+)
+
+# Diagramm anzeigen
+fig.show()
+
+
+
+
+
+
+
+
+2.Gib mir farben in  Hexadezimalformat für Python 
+
+
+colors = ['#1F77B4', '#FF7F0E', '#2CA02C', '#D62728', '#9467BD', '#8C564B', '#E377C2', '#7F7F7F']
